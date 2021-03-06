@@ -4,6 +4,9 @@ export const TOKEN_MISSING_ERROR = "Token missing from header";
 // USER MESSAGES
 export const INTERNAL_SERVER_ERROR_USERS = "There was an error. Please, try again.";
 export const BAD_REQUEST_ERROR_USERS = "There is an error in the insertion format.";
+export const DUPLICATED_ERROR_USERS = "User already exist with given email.";
+export const INVALID_PASSWORD = "Incorrect password for given email.";
+export const NOT_FOUND_USER = "User not found.";
 export const FORBIDDEN_ERROR_USERS = "Sorry, you do not have enough permissions to complete this operations.";
 
 // TASK MESSAGES

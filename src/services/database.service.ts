@@ -22,7 +22,7 @@ export class DatabaseService {
     }
   }
 
-  public query = async (query, params) => {
+  public query = async (query, params): Promise<any> => {
     const {rows} = await this.db.query(query, params);
 
     return rows;

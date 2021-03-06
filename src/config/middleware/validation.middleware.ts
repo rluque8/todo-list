@@ -6,8 +6,8 @@ class ValidationMiddleware {
     return (req, res, next) => {
       const error = this.validateObjectSchema(req.query, schema);
       if (error) {
-        const response = new ResponseDto<string>(error, "ERROR");
-        return res.status(400).json(response);
+        const response = new ResponseDto<string>(error, 400, "ERROR");
+        return res.status(response.code).json(response);
       }
       return next();
     };
@@ -17,8 +17,8 @@ class ValidationMiddleware {
     return (req, res, next) => {
       const error = this.validateObjectSchema(req.body, schema);
       if (error) {
-        const response = new ResponseDto<string>(error, "ERROR");
-        return res.status(400).json(response);
+        const response = new ResponseDto<string>(error, 400, "ERROR");
+        return res.status(response.code).json(response);
       }
       return next();
     };

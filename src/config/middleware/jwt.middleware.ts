@@ -7,8 +7,8 @@ class JwtMiddleware {
   public validateToken = (req, res, next) => {
     try {
       if (!req.headers.authorization) {
-        const response = new ResponseDto<string>(TOKEN_MISSING_ERROR, "ERROR");
-        res.status(401).json(response);
+        const response = new ResponseDto<string>(TOKEN_MISSING_ERROR, 401, "ERROR");
+        res.status(response.code).json(response);
       }
       const token = req.headers.authorization.split("Bearer")[1].trim();
       const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
@@ -18,8 +18,9 @@ class JwtMiddleware {
     } catch (error) {
       console.log("Error", error);
       const response = new ResponseDto<string>((error && error.message) ? error.message : GENERAL_FORBIDDEN_ERROR,
+                                              401,
                                               "ERROR");
-      return res.status(401).json(response);
+      return res.status(response.code).json(response);
     }
   }
 }
