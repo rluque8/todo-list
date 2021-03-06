@@ -1,13 +1,10 @@
+import pool from "../config/database";
 import { ResponseDto } from "../config/dto/response.dto";
 import { ITaskCreateDto, ITaskGetAllDto, ITaskUpdateStatusDto } from "../config/dto/tasks.dto";
-import { INTERNAL_SERVER_ERROR_TASKS } from "../config/messages/messages";
-import DatabaseService from "./database.service";
+import { CREATED_TASK, INTERNAL_SERVER_ERROR_TASKS, UPDATED_TASK } from "../config/messages/messages";
+import { ITask } from "../interfaces/task";
 
 class TasksService {
-  private dbService: DatabaseService;
-
-  constructor() {
-  }
 
   /**
    * Create new task in the list
@@ -17,7 +14,16 @@ class TasksService {
    */
   public create = async (task: ITaskCreateDto) => {
     try {
+      const client = await pool.connect();
 
+      await client.query(
+        "INSERT INTO tasks(description, status, priority, created_at) VALUES ($1, $2, $3, $4)",
+        [task.description, task.status, task.priority, new Date()],
+      );
+
+      client.release();
+
+      return new ResponseDto<string>(CREATED_TASK);
     } catch (error) {
       console.log("Error in task service: create");
       console.log(error);
@@ -34,7 +40,17 @@ class TasksService {
    */
   public updateStatus = async (id: number,  task: ITaskUpdateStatusDto) => {
     try {
-      // return new ResponseDto<any>(status, message);
+      const client = await pool.connect();
+
+      await client.query(
+        "UPDATE tasks SET status = $1 WHERE id = $2",
+        [task.status, id],
+      );
+
+      client.release();
+
+      return new ResponseDto<string>(UPDATED_TASK);
+
     } catch (error) {
       console.log("Error in task service: updateStatus");
       console.log(error);
@@ -51,7 +67,16 @@ class TasksService {
 
   public getAll = async (params: ITaskGetAllDto) => {
     try {
+      const client = await pool.connect();
 
+      const result = await client.query(
+        "SELECT * FROM tasks LIMIT $1 OFFSET $2",
+        [params.limit, params.skip],
+      );
+
+      client.release();
+
+      return new ResponseDto<ITask[]>(result.rows);
     } catch (error) {
       console.log("Error in task service: getAll");
       console.log(error);

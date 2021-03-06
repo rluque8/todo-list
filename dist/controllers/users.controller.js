@@ -26,14 +26,17 @@ class UsersController {
             this.router.delete("/:id", this.jwtMiddleware.validateToken, this.deleteUser);
         };
         this.loginUser = (request, response) => __awaiter(this, void 0, void 0, function* () {
-            response.send(yield this.usersService.login(request.body));
+            const resp = yield this.usersService.login(request.body);
+            return response.status(resp.code).json(resp);
         });
         this.registerUser = (request, response) => __awaiter(this, void 0, void 0, function* () {
-            response.send(yield this.usersService.register(request.body));
+            const resp = yield this.usersService.register(request.body);
+            return response.status(resp.code).json(resp);
         });
         this.deleteUser = (request, response) => __awaiter(this, void 0, void 0, function* () {
             const userId = parseInt(request.params.id, 10);
-            response.send(yield this.usersService.delete(userId));
+            const resp = yield this.usersService.delete(userId);
+            return response.status(resp.code).json(resp);
         });
         this.usersService = new users_service_1.default();
         this.validationMiddleware = new validation_middleware_1.default();

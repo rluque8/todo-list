@@ -1,10 +1,10 @@
-import { TaskPriority } from "../config/enumerators/task-priority.enum";
-import { TaskStatus } from "../config/enumerators/task-status.enum";
+export type TaskStatus = "PENDING" | "DONE" | "DROPPED";
+export type TaskPriority = 1 | 2 | 3;
 
 export interface ITask {
   id: string;
   description: string;
   status: TaskStatus;
   priority: TaskPriority;
-  createdAt: Date;
+  created_at: Date;
 }

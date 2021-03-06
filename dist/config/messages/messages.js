@@ -9,8 +9,12 @@ exports.DUPLICATED_ERROR_USERS = "User already exist with given email.";
 exports.INVALID_PASSWORD = "Incorrect password for given email.";
 exports.NOT_FOUND_USER = "User not found.";
 exports.FORBIDDEN_ERROR_USERS = "Sorry, you do not have enough permissions to complete this operations.";
+exports.CREATED_USER = "User was created successfully.";
+exports.DELETED_USER = "User was deleted successfully.";
 // TASK MESSAGES
 exports.INTERNAL_SERVER_ERROR_TASKS = "There was an error. Please, try again.";
 exports.BAD_REQUEST_ERROR_TASKS = "There is an error in the insertion format.";
 exports.FORBIDDEN_ERROR_TASKS = "Sorry, you do not have enough permissions to complete this operations.";
+exports.CREATED_TASK = "Task was created successfully.";
+exports.UPDATED_TASK = "Task was updated successfully.";
 //# sourceMappingURL=messages.js.map

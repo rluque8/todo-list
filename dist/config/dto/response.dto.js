@@ -1,9 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class ResponseDto {
-    constructor(result, code, status) {
-        this.code = 200;
-        this.status = "OK";
+    constructor(result, code = 200, status = "OK") {
         this.code = code;
         this.result = result;
         this.status = status;

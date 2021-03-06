@@ -37,16 +37,19 @@ class UsersController {
   }
 
   public loginUser = async (request: express.Request, response: express.Response) => {
-    response.send(await this.usersService.login(request.body));
+    const resp = await this.usersService.login(request.body);
+    return response.status(resp.code).json(resp);
   }
 
   public registerUser = async (request: express.Request, response: express.Response) => {
-    response.send(await this.usersService.register(request.body));
+    const resp = await this.usersService.register(request.body);
+    return response.status(resp.code).json(resp);
   }
 
   public deleteUser = async (request: express.Request, response: express.Response) => {
     const userId = parseInt(request.params.id, 10);
-    response.send(await this.usersService.delete(userId));
+    const resp = await this.usersService.delete(userId);
+    return response.status(resp.code).json(resp);
   }
 }
 

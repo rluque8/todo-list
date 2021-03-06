@@ -1,10 +1,10 @@
 export class ResponseDto<T> {
 
-  public code: number = 200;
+  public code: number;
   public result: T;
-  public status: string = "OK";
+  public status: string;
 
-  constructor(result: T, code?: number, status?: string) {
+  constructor(result: T, code: number = 200, status: string = "OK") {
     this.code = code;
     this.result = result;
     this.status = status;

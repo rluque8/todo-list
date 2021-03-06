@@ -7,9 +7,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const response_dto_1 = require("../config/dto/response.dto");
 const messages_1 = require("../config/messages/messages");
+const database_service_1 = __importDefault(require("./database.service"));
 class TasksService {
     constructor() {
         /**
@@ -20,6 +24,10 @@ class TasksService {
          */
         this.create = (task) => __awaiter(this, void 0, void 0, function* () {
             try {
+                const client = yield database_service_1.default.connect();
+                yield client.query("INSERT INTO tasks(description, status, priority, created_at) VALUES ($1, $2, $3, $4)", [task.description, task.status, task.priority, new Date()]);
+                client.release();
+                return new response_dto_1.ResponseDto(messages_1.CREATED_TASK);
             }
             catch (error) {
                 console.log("Error in task service: create");
@@ -36,7 +44,10 @@ class TasksService {
          */
         this.updateStatus = (id, task) => __awaiter(this, void 0, void 0, function* () {
             try {
-                // return new ResponseDto<any>(status, message);
+                const client = yield database_service_1.default.connect();
+                yield client.query("UPDATE tasks SET status = $1 WHERE id = $2", [task.status, id]);
+                client.release();
+                return new response_dto_1.ResponseDto(messages_1.UPDATED_TASK);
             }
             catch (error) {
                 console.log("Error in task service: updateStatus");
@@ -52,6 +63,10 @@ class TasksService {
          */
         this.getAll = (params) => __awaiter(this, void 0, void 0, function* () {
             try {
+                const client = yield database_service_1.default.connect();
+                const result = yield client.query("SELECT * FROM tasks LIMIT $1 OFFSET $2", [params.limit, params.skip]);
+                client.release();
+                return new response_dto_1.ResponseDto(result.rows);
             }
             catch (error) {
                 console.log("Error in task service: getAll");

@@ -1,5 +1,4 @@
-import { TaskPriority } from "../enumerators/task-priority.enum";
-import { TaskStatus } from "../enumerators/task-status.enum";
+import { TaskPriority, TaskStatus } from "../../interfaces/task";
 
 export interface ITaskCreateDto {
   description: string;

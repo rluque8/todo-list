@@ -2,20 +2,16 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
-import { Pool } from "pg";
-import DatabaseService from "./services/database.service";
+import pool from "./config/database";
 
 class App {
 
   public app: express.Application;
   public port: number;
-  public client: Pool;
-  public dbService: DatabaseService;
 
   constructor(controllers, port) {
     this.app = express();
     this.port = port;
-    this.dbService = new DatabaseService();
     dotenv.config();
 
     this.connectToDb();
@@ -39,13 +35,23 @@ class App {
   }
 
   private initializeControllers = (controllers) => {
+
+    // Initialize all controllers with its corresponding route
     controllers.forEach((controller) => {
-      this.app.use(controller.path, controller.router);
+      this.app.use("/api/v1" + controller.path, controller.router);
     });
   }
 
   private connectToDb = async () => {
-    await this.dbService.init();
+    try {
+      // Connect to the postgres database
+      await pool.connect();
+      console.log("Database connected successfully!");
+    } catch (error) {
+      console.log("Error while connecting to the database");
+      console.log(error);
+      throw new Error(error);
+    }
   }
 }
 

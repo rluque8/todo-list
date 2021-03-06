@@ -31,17 +31,24 @@ class App {
         };
         this.initializeControllers = (controllers) => {
             controllers.forEach((controller) => {
-                this.app.use(controller.path, controller.router);
+                this.app.use("/api/v1" + controller.path, controller.router);
             });
         };
         this.connectToDb = () => __awaiter(this, void 0, void 0, function* () {
-            yield this.dbService.init();
+            try {
+                yield database_service_1.default.connect();
+                console.log("Database connected successfully!");
+            }
+            catch (error) {
+                console.log("Error while connecting to the database");
+                console.log(error);
+                throw new Error(error);
+            }
         });
         this.app = express_1.default();
         this.port = port;
-        this.dbService = new database_service_1.default();
         dotenv_1.default.config();
-        // this.connectToDb();
+        this.connectToDb();
         this.initializeMiddlewares();
         this.initializeControllers(controllers);
         this.setUpCors();

@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const response_dto_1 = require("../config/dto/response.dto");
 const messages_1 = require("../config/messages/messages");
 const database_service_1 = __importDefault(require("./database.service"));
@@ -25,16 +26,22 @@ class UsersService {
          */
         this.login = (user) => __awaiter(this, void 0, void 0, function* () {
             try {
-                const users = yield this.dbService.query(`SELECT * FROM users WHERE email = $1`, [user.email]);
-                if (users.length === 0) {
+                const client = yield database_service_1.default.connect();
+                // Query to check if the user exists on db or not
+                const users = yield client.query(`SELECT * FROM users WHERE email = $1`, [user.email]);
+                if (!users || users.rows.length === 0) {
                     return new response_dto_1.ResponseDto(messages_1.NOT_FOUND_USER, 400, "ERROR");
                 }
-                const userDb = users[0];
+                const userDb = users.rows[0];
+                // Validate user's typed password with the one stored in db
                 const isValid = yield bcrypt_1.default.compare(user.password, userDb.password);
                 if (!isValid) {
                     return new response_dto_1.ResponseDto(messages_1.INVALID_PASSWORD, 400, "ERROR");
                 }
-                // TODO:
+                // Generate an auth token valid for 1 day
+                const token = jsonwebtoken_1.default.sign({ id: user.email }, process.env.SECRET_KEY, { expiresIn: "1d" });
+                client.release();
+                return new response_dto_1.ResponseDto(token);
             }
             catch (error) {
                 console.log("Error in user service: login");
@@ -50,14 +57,17 @@ class UsersService {
          */
         this.register = (user) => __awaiter(this, void 0, void 0, function* () {
             try {
-                // Find in db if user email already exists
-                const users = yield this.dbService.query("SELECT id FROM users WHERE email = $1", [user.email]);
-                if (users.length > 0) {
+                const client = yield database_service_1.default.connect();
+                // Find in db if user email already exists and therefore duplicated
+                const users = yield client.query("SELECT id FROM users WHERE email = $1", [user.email]);
+                if (!users || users.rows.length > 0) {
                     return new response_dto_1.ResponseDto(messages_1.DUPLICATED_ERROR_USERS, 400, "ERROR");
                 }
+                // Hash the plain password to store it in db with 12 salt rounds
                 const password = yield bcrypt_1.default.hash(user.password, 12);
-                // TODO:
-                const result = yield this.dbService.query("INSERT INTO users(email, name, password) VALUES ($1, $2, $3)", [user.email, user.name, password]);
+                yield client.query("INSERT INTO users(email, name, password) VALUES ($1, $2, $3)", [user.email, user.name, password]);
+                client.release();
+                return new response_dto_1.ResponseDto(messages_1.CREATED_USER);
             }
             catch (error) {
                 console.log("Error in user service: register");
@@ -73,8 +83,10 @@ class UsersService {
          */
         this.delete = (id) => __awaiter(this, void 0, void 0, function* () {
             try {
-                // TODO:
-                const result = yield this.dbService.query("DELETE * FROM users WHERE id = $1", [id]);
+                const client = yield database_service_1.default.connect();
+                yield client.query("DELETE FROM users WHERE id = $1", [id]);
+                client.release();
+                return new response_dto_1.ResponseDto(messages_1.DELETED_USER, 500, "ERROR");
             }
             catch (error) {
                 console.log("Error in user service: delete");
@@ -82,7 +94,6 @@ class UsersService {
                 return new response_dto_1.ResponseDto(messages_1.INTERNAL_SERVER_ERROR_USERS, 500, "ERROR");
             }
         });
-        this.dbService = new database_service_1.default();
     }
 }
 exports.default = UsersService;
