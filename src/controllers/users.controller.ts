@@ -4,6 +4,7 @@ import ValidationMiddleware from "../config/middleware/validation.middleware";
 import {
   userLoginSchema,
   userRegisterSchema,
+  userTokenSchema,
 } from "../config/schemas/user.schema";
 import UsersService from "../services/users.service";
 
@@ -31,6 +32,10 @@ class UsersController {
                     this.validationMiddleware.validateBody(userLoginSchema),
                     this.loginUser);
 
+    this.router.post("/token",
+                    this.validationMiddleware.validateBody(userTokenSchema),
+                    this.refreshToken);
+
     this.router.delete("/:id",
                       this.jwtMiddleware.validateToken,
                       this.deleteUser);
@@ -38,6 +43,11 @@ class UsersController {
 
   public loginUser = async (request: express.Request, response: express.Response) => {
     const resp = await this.usersService.login(request.body);
+    return response.status(resp.code).json(resp);
+  }
+
+  public refreshToken = async (request: express.Request, response: express.Response) => {
+    const resp = await this.usersService.refreshToken(request.body);
     return response.status(resp.code).json(resp);
   }
 

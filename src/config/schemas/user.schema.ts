@@ -10,3 +10,8 @@ export const userRegisterSchema = Joi.object().keys({
   name: Joi.string().required(),
   password: Joi.string().required(),
 });
+
+export const userTokenSchema = Joi.object().keys({
+  id: Joi.number().required(),
+  refreshToken: Joi.string().required(),
+});

@@ -23,10 +23,15 @@ class UsersController {
         this.initRoutes = () => {
             this.router.post("", this.validationMiddleware.validateBody(user_schema_1.userRegisterSchema), this.registerUser);
             this.router.post("/login", this.validationMiddleware.validateBody(user_schema_1.userLoginSchema), this.loginUser);
+            this.router.post("/token", this.validationMiddleware.validateBody(user_schema_1.userTokenSchema), this.refreshToken);
             this.router.delete("/:id", this.jwtMiddleware.validateToken, this.deleteUser);
         };
         this.loginUser = (request, response) => __awaiter(this, void 0, void 0, function* () {
             const resp = yield this.usersService.login(request.body);
+            return response.status(resp.code).json(resp);
+        });
+        this.refreshToken = (request, response) => __awaiter(this, void 0, void 0, function* () {
+            const resp = yield this.usersService.refreshToken(request.body);
             return response.status(resp.code).json(resp);
         });
         this.registerUser = (request, response) => __awaiter(this, void 0, void 0, function* () {

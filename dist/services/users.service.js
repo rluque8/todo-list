@@ -13,20 +13,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const database_1 = __importDefault(require("../config/database"));
 const response_dto_1 = require("../config/dto/response.dto");
 const messages_1 = require("../config/messages/messages");
-const database_service_1 = __importDefault(require("./database.service"));
 class UsersService {
     constructor() {
+        this.refreshTokens = {};
         /**
          * Login user in the system
          *
          * @param IUserLoginDto
-         * @returns Promise<ResponseDto<string>>
+         * @returns Promise<ResponseDto<IUserLoginResponseDto>>
          */
         this.login = (user) => __awaiter(this, void 0, void 0, function* () {
             try {
-                const client = yield database_service_1.default.connect();
+                const client = yield database_1.default.connect();
                 // Query to check if the user exists on db or not
                 const users = yield client.query(`SELECT * FROM users WHERE email = $1`, [user.email]);
                 if (!users || users.rows.length === 0) {
@@ -38,10 +39,33 @@ class UsersService {
                 if (!isValid) {
                     return new response_dto_1.ResponseDto(messages_1.INVALID_PASSWORD, 400, "ERROR");
                 }
-                // Generate an auth token valid for 1 day
-                const token = jsonwebtoken_1.default.sign({ id: user.email }, process.env.SECRET_KEY, { expiresIn: "1d" });
+                // Generate an auth token valid for 1 day and a refresh token generated randomly for it
+                const token = jsonwebtoken_1.default.sign({ id: userDb.id }, process.env.SECRET_KEY, { expiresIn: "1d" });
+                const refreshToken = jsonwebtoken_1.default.sign(user, process.env.REFRESH_SECRET_KEY, {});
+                this.refreshTokens[refreshToken] = userDb.id;
                 client.release();
-                return new response_dto_1.ResponseDto(token);
+                return new response_dto_1.ResponseDto({ id: userDb.id, email: userDb.email, token, refreshToken });
+            }
+            catch (error) {
+                console.log("Error in user service: login");
+                console.log(error);
+                return new response_dto_1.ResponseDto(messages_1.INTERNAL_SERVER_ERROR_USERS, 500, "ERROR");
+            }
+        });
+        /**
+         * Refrsh user authentication token
+         *
+         * @param IUserTokenDto
+         * @returns Promise<ResponseDto<IUserLoginResponseDto>>
+         */
+        this.refreshToken = (user) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                // Check if the refresh token exists and corresponds to the same user
+                if ((user.refreshToken) && (this.refreshTokens[user.refreshToken] === user.id)) {
+                    const token = jsonwebtoken_1.default.sign({ id: user.id }, process.env.SECRET_KEY, { expiresIn: "1d" });
+                    return new response_dto_1.ResponseDto({ token });
+                }
+                return new response_dto_1.ResponseDto(messages_1.FORBIDDEN_ERROR_USERS, 401, "ERROR");
             }
             catch (error) {
                 console.log("Error in user service: login");
@@ -57,7 +81,7 @@ class UsersService {
          */
         this.register = (user) => __awaiter(this, void 0, void 0, function* () {
             try {
-                const client = yield database_service_1.default.connect();
+                const client = yield database_1.default.connect();
                 // Find in db if user email already exists and therefore duplicated
                 const users = yield client.query("SELECT id FROM users WHERE email = $1", [user.email]);
                 if (!users || users.rows.length > 0) {
@@ -83,7 +107,7 @@ class UsersService {
          */
         this.delete = (id) => __awaiter(this, void 0, void 0, function* () {
             try {
-                const client = yield database_service_1.default.connect();
+                const client = yield database_1.default.connect();
                 yield client.query("DELETE FROM users WHERE id = $1", [id]);
                 client.release();
                 return new response_dto_1.ResponseDto(messages_1.DELETED_USER, 500, "ERROR");

@@ -15,7 +15,7 @@ const body_parser_1 = __importDefault(require("body-parser"));
 const cors_1 = __importDefault(require("cors"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const express_1 = __importDefault(require("express"));
-const database_service_1 = __importDefault(require("./services/database.service"));
+const database_1 = __importDefault(require("./config/database"));
 class App {
     constructor(controllers, port) {
         this.listen = () => {
@@ -30,13 +30,15 @@ class App {
             this.app.use(cors_1.default());
         };
         this.initializeControllers = (controllers) => {
+            // Initialize all controllers with its corresponding route
             controllers.forEach((controller) => {
                 this.app.use("/api/v1" + controller.path, controller.router);
             });
         };
         this.connectToDb = () => __awaiter(this, void 0, void 0, function* () {
             try {
-                yield database_service_1.default.connect();
+                // Connect to the postgres database
+                yield database_1.default.connect();
                 console.log("Database connected successfully!");
             }
             catch (error) {

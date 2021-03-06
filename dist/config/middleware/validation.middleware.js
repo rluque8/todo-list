@@ -5,6 +5,7 @@ class ValidationMiddleware {
     constructor() {
         this.validateQueryParams = (schema) => {
             return (req, res, next) => {
+                // Validate the query params received with the schema created
                 const error = this.validateObjectSchema(req.query, schema);
                 if (error) {
                     const response = new response_dto_1.ResponseDto(error, 400, "ERROR");
@@ -15,6 +16,7 @@ class ValidationMiddleware {
         };
         this.validateBody = (schema) => {
             return (req, res, next) => {
+                // Validate the body received with the schema created
                 const error = this.validateObjectSchema(req.body, schema);
                 if (error) {
                     const response = new response_dto_1.ResponseDto(error, 400, "ERROR");

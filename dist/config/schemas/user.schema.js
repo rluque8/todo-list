@@ -13,4 +13,8 @@ exports.userRegisterSchema = joi_1.default.object().keys({
     name: joi_1.default.string().required(),
     password: joi_1.default.string().required(),
 });
+exports.userTokenSchema = joi_1.default.object().keys({
+    id: joi_1.default.number().required(),
+    refreshToken: joi_1.default.string().required(),
+});
 //# sourceMappingURL=user.schema.js.map
