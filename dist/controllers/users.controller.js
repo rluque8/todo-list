@@ -12,15 +12,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const jwt_middleware_1 = __importDefault(require("../config/middleware/jwt.middleware"));
+const validation_middleware_1 = __importDefault(require("../config/middleware/validation.middleware"));
+const user_schema_1 = require("../config/schemas/user.schema");
 const users_service_1 = __importDefault(require("../services/users.service"));
 class UsersController {
     constructor() {
         this.path = "/users";
         this.router = express_1.default.Router();
         this.initRoutes = () => {
-            this.router.post(this.path, this.registerUser);
-            this.router.post(this.path + "/login", this.loginUser);
-            this.router.delete(this.path + "/:id", this.deleteUser);
+            this.router.post("", this.validationMiddleware.validateBody(user_schema_1.userRegisterSchema), this.registerUser);
+            this.router.post("/login", this.validationMiddleware.validateBody(user_schema_1.userLoginSchema), this.loginUser);
+            this.router.delete("/:id", this.jwtMiddleware.validateToken, this.deleteUser);
         };
         this.loginUser = (request, response) => __awaiter(this, void 0, void 0, function* () {
             response.send(yield this.usersService.login(request.body));
@@ -33,6 +36,8 @@ class UsersController {
             response.send(yield this.usersService.delete(userId));
         });
         this.usersService = new users_service_1.default();
+        this.validationMiddleware = new validation_middleware_1.default();
+        this.jwtMiddleware = new jwt_middleware_1.default();
         this.initRoutes();
     }
 }

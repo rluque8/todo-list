@@ -12,15 +12,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const jwt_middleware_1 = __importDefault(require("../config/middleware/jwt.middleware"));
+const validation_middleware_1 = __importDefault(require("../config/middleware/validation.middleware"));
+const task_schema_1 = require("../config/schemas/task.schema");
 const tasks_service_1 = __importDefault(require("../services/tasks.service"));
 class TasksController {
     constructor() {
         this.path = "/tasks";
         this.router = express_1.default.Router();
         this.initRoutes = () => {
-            this.router.post(this.path, this.createTask);
-            this.router.put(this.path + "/:id", this.updateTask);
-            this.router.get(this.path, this.getAllTasks);
+            this.router.post("", this.jwtMiddleware.validateToken, this.validationMiddleware.validateBody(task_schema_1.taskCreateSchema), this.createTask);
+            this.router.put("/:id", this.jwtMiddleware.validateToken, this.validationMiddleware.validateBody(task_schema_1.taskUpdateStatusSchema), this.updateTask);
+            this.router.get("", this.jwtMiddleware.validateToken, this.validationMiddleware.validateQueryParams(task_schema_1.taskGetAllSchema), this.getAllTasks);
         };
         this.createTask = (request, response) => __awaiter(this, void 0, void 0, function* () {
             response.send(yield this.tasksService.create(request.body));
@@ -33,6 +36,8 @@ class TasksController {
             response.send(yield this.tasksService.getAll(request.body));
         });
         this.tasksService = new tasks_service_1.default();
+        this.validationMiddleware = new validation_middleware_1.default();
+        this.jwtMiddleware = new jwt_middleware_1.default();
         this.initRoutes();
     }
 }
