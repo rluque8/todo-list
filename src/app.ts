@@ -4,7 +4,8 @@ import dotenv from "dotenv";
 import express from "express";
 import * as swaggerUi from "swagger-ui-express";
 import pool from "./config/database/connection";
-import {swaggerJson} from "./config/swagger/swagger-file";
+import { QUERY_INIT_TABLES } from "./config/database/queries";
+import { swaggerJson } from "./config/swagger/swagger-file";
 class App {
 
   public app: express.Application;
@@ -39,7 +40,7 @@ class App {
   }
 
   private initSwagger = () => {
-    // this.swaggerDocument = yaml.load("./config/swagger/swagger.yaml");
+    // Defined the endpoint to see the Swagger documentation with endpoints
     this.app.use(this.apiPath + "/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerJson));
   }
 
@@ -56,8 +57,22 @@ class App {
       // Connect to the postgres database
       await pool.connect();
       console.log("Database connected successfully!");
+      await this.initDb();
     } catch (error) {
       console.log("Error while connecting to the database");
+      console.log(error);
+      throw new Error(error);
+    }
+  }
+
+  private initDb = async () => {
+    try {
+      const client = await pool.connect();
+      await client.query(QUERY_INIT_TABLES);
+      client.release();
+
+    } catch (error) {
+      console.log("Error initializing database");
       console.log(error);
       throw new Error(error);
     }

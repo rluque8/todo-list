@@ -54,9 +54,34 @@ class App {
                 // Connect to the postgres database
                 yield connection_1.default.connect();
                 console.log("Database connected successfully!");
+                yield this.initDb();
             }
             catch (error) {
                 console.log("Error while connecting to the database");
+                console.log(error);
+                throw new Error(error);
+            }
+        });
+        this.initDb = () => __awaiter(this, void 0, void 0, function* () {
+            try {
+                const client = yield connection_1.default.connect();
+                yield client.query(`CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(50),
+        email VARCHAR(60),
+        password VARCHAR(200)
+      );
+
+      CREATE TABLE IF NOT EXISTS tasks (
+        id SERIAL PRIMARY KEY,
+        description VARCHAR(100),
+        status VARCHAR(10),
+        priority smallint DEFAULT 1,
+        created_at timestamp);`);
+                client.release();
+            }
+            catch (error) {
+                console.log("Error initializing database");
                 console.log(error);
                 throw new Error(error);
             }

@@ -1,6 +1,8 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import pool from "../config/database/connection";
+import { QUERY_USER_BY_EMAIL, QUERY_USER_DELETE,
+          QUERY_USER_ID_BY_EMAIL, QUERY_USER_INSERT } from "../config/database/queries";
 import { ResponseDto } from "../config/dto/response.dto";
 import { IUserLoginDto, IUserLoginResponseDto, IUserRegisterDto,
           IUserTokenDto, IUserTokenResponseDto } from "../config/dto/users.dto";
@@ -21,7 +23,7 @@ class UsersService {
     try {
       const client = await pool.connect();
       // Query to check if the user exists on db or not
-      const users = await client.query(`SELECT * FROM users WHERE email = $1`, [user.email]);
+      const users = await client.query(QUERY_USER_BY_EMAIL, [user.email]);
 
       if (!users || users.rows.length === 0) {
         return new ResponseDto<string>(NOT_FOUND_USER, 400, "ERROR");
@@ -86,7 +88,7 @@ class UsersService {
     try {
       const client = await pool.connect();
       // Find in db if user email already exists and therefore duplicated
-      const users = await client.query("SELECT id FROM users WHERE email = $1", [user.email]);
+      const users = await client.query(QUERY_USER_ID_BY_EMAIL, [user.email]);
 
       if (!users || users.rows.length > 0) {
         return new ResponseDto<string>(DUPLICATED_ERROR_USERS, 400, "ERROR");
@@ -96,7 +98,7 @@ class UsersService {
       const password = await bcrypt.hash(user.password, 12);
 
       await client.query(
-        "INSERT INTO users(email, name, password) VALUES ($1, $2, $3)",
+        QUERY_USER_INSERT,
         [user.email, user.name, password],
       );
 
@@ -122,7 +124,7 @@ class UsersService {
       const client = await pool.connect();
 
       await client.query(
-        "DELETE FROM users WHERE id = $1",
+        QUERY_USER_DELETE,
         [id],
       );
       client.release();

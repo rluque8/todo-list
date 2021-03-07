@@ -1,4 +1,5 @@
 import pool from "../config/database/connection";
+import { QUERY_GET_ALL_TASKS, QUERY_TASK_INSERT, QUERY_USER_UPDATE_STATUS } from "../config/database/queries";
 import { ResponseDto } from "../config/dto/response.dto";
 import { ITaskCreateDto, ITaskGetAllDto, ITaskUpdateStatusDto } from "../config/dto/tasks.dto";
 import { CREATED_TASK, INTERNAL_SERVER_ERROR_TASKS, UPDATED_TASK } from "../config/messages/messages";
@@ -17,7 +18,7 @@ class TasksService {
       const client = await pool.connect();
 
       await client.query(
-        "INSERT INTO tasks(description, status, priority, created_at) VALUES ($1, $2, $3, $4)",
+        QUERY_TASK_INSERT,
         [task.description, task.status, task.priority, new Date()],
       );
 
@@ -43,7 +44,7 @@ class TasksService {
       const client = await pool.connect();
 
       await client.query(
-        "UPDATE tasks SET status = $1 WHERE id = $2",
+        QUERY_USER_UPDATE_STATUS,
         [task.status, id],
       );
 
@@ -70,7 +71,7 @@ class TasksService {
       const client = await pool.connect();
 
       const result = await client.query(
-        "SELECT * FROM tasks LIMIT $1 OFFSET $2",
+        QUERY_GET_ALL_TASKS,
         [params.limit, params.skip],
       );
 
