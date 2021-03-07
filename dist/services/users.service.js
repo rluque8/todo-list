@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const database_1 = __importDefault(require("../config/database"));
+const connection_1 = __importDefault(require("../config/database/connection"));
 const response_dto_1 = require("../config/dto/response.dto");
 const messages_1 = require("../config/messages/messages");
 class UsersService {
@@ -27,7 +27,7 @@ class UsersService {
          */
         this.login = (user) => __awaiter(this, void 0, void 0, function* () {
             try {
-                const client = yield database_1.default.connect();
+                const client = yield connection_1.default.connect();
                 // Query to check if the user exists on db or not
                 const users = yield client.query(`SELECT * FROM users WHERE email = $1`, [user.email]);
                 if (!users || users.rows.length === 0) {
@@ -39,7 +39,7 @@ class UsersService {
                 if (!isValid) {
                     return new response_dto_1.ResponseDto(messages_1.INVALID_PASSWORD, 400, "ERROR");
                 }
-                // Generate an auth token valid for 1 day and a refresh token generated randomly for it
+                // Generate an auth token valid for 1 day and a refresh token
                 const token = jsonwebtoken_1.default.sign({ id: userDb.id }, process.env.SECRET_KEY, { expiresIn: "1d" });
                 const refreshToken = jsonwebtoken_1.default.sign(user, process.env.REFRESH_SECRET_KEY, {});
                 this.refreshTokens[refreshToken] = userDb.id;
@@ -81,7 +81,7 @@ class UsersService {
          */
         this.register = (user) => __awaiter(this, void 0, void 0, function* () {
             try {
-                const client = yield database_1.default.connect();
+                const client = yield connection_1.default.connect();
                 // Find in db if user email already exists and therefore duplicated
                 const users = yield client.query("SELECT id FROM users WHERE email = $1", [user.email]);
                 if (!users || users.rows.length > 0) {
@@ -107,7 +107,7 @@ class UsersService {
          */
         this.delete = (id) => __awaiter(this, void 0, void 0, function* () {
             try {
-                const client = yield database_1.default.connect();
+                const client = yield connection_1.default.connect();
                 yield client.query("DELETE FROM users WHERE id = $1", [id]);
                 client.release();
                 return new response_dto_1.ResponseDto(messages_1.DELETED_USER, 500, "ERROR");

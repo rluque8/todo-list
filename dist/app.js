@@ -10,14 +10,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const body_parser_1 = __importDefault(require("body-parser"));
 const cors_1 = __importDefault(require("cors"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const express_1 = __importDefault(require("express"));
-const database_1 = __importDefault(require("./config/database"));
+const swaggerUi = __importStar(require("swagger-ui-express"));
+const connection_1 = __importDefault(require("./config/database/connection"));
+const swagger_file_1 = require("./config/swagger/swagger-file");
 class App {
     constructor(controllers, port) {
+        this.apiPath = "/api/v1";
         this.listen = () => {
             this.app.listen(this.port, () => {
                 console.log(`Server listening on port: ${this.port}`);
@@ -29,16 +39,20 @@ class App {
         this.setUpCors = () => {
             this.app.use(cors_1.default());
         };
+        this.initSwagger = () => {
+            // this.swaggerDocument = yaml.load("./config/swagger/swagger.yaml");
+            this.app.use(this.apiPath + "/api-docs", swaggerUi.serve, swaggerUi.setup(swagger_file_1.swaggerJson));
+        };
         this.initializeControllers = (controllers) => {
             // Initialize all controllers with its corresponding route
             controllers.forEach((controller) => {
-                this.app.use("/api/v1" + controller.path, controller.router);
+                this.app.use(this.apiPath + controller.path, controller.router);
             });
         };
         this.connectToDb = () => __awaiter(this, void 0, void 0, function* () {
             try {
                 // Connect to the postgres database
-                yield database_1.default.connect();
+                yield connection_1.default.connect();
                 console.log("Database connected successfully!");
             }
             catch (error) {
@@ -52,6 +66,7 @@ class App {
         dotenv_1.default.config();
         this.connectToDb();
         this.initializeMiddlewares();
+        this.initSwagger();
         this.initializeControllers(controllers);
         this.setUpCors();
     }

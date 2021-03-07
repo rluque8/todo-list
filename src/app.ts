@@ -2,12 +2,15 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
-import pool from "./config/database";
-
+import * as swaggerUi from "swagger-ui-express";
+import pool from "./config/database/connection";
+import {swaggerJson} from "./config/swagger/swagger-file";
 class App {
 
   public app: express.Application;
   public port: number;
+  public swaggerDocument: any;
+  private apiPath = "/api/v1";
 
   constructor(controllers, port) {
     this.app = express();
@@ -16,6 +19,7 @@ class App {
 
     this.connectToDb();
     this.initializeMiddlewares();
+    this.initSwagger();
     this.initializeControllers(controllers);
     this.setUpCors();
   }
@@ -34,11 +38,16 @@ class App {
     this.app.use(cors());
   }
 
+  private initSwagger = () => {
+    // this.swaggerDocument = yaml.load("./config/swagger/swagger.yaml");
+    this.app.use(this.apiPath + "/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerJson));
+  }
+
   private initializeControllers = (controllers) => {
 
     // Initialize all controllers with its corresponding route
     controllers.forEach((controller) => {
-      this.app.use("/api/v1" + controller.path, controller.router);
+      this.app.use(this.apiPath + controller.path, controller.router);
     });
   }
 

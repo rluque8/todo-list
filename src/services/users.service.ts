@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import pool from "../config/database";
+import pool from "../config/database/connection";
 import { ResponseDto } from "../config/dto/response.dto";
 import { IUserLoginDto, IUserLoginResponseDto, IUserRegisterDto,
           IUserTokenDto, IUserTokenResponseDto } from "../config/dto/users.dto";

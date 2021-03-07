@@ -1,4 +1,4 @@
-import pool from "../config/database";
+import pool from "../config/database/connection";
 import { ResponseDto } from "../config/dto/response.dto";
 import { ITaskCreateDto, ITaskGetAllDto, ITaskUpdateStatusDto } from "../config/dto/tasks.dto";
 import { CREATED_TASK, INTERNAL_SERVER_ERROR_TASKS, UPDATED_TASK } from "../config/messages/messages";
