@@ -1,0 +1,231 @@
+swagger: '2.0'
+info:
+  description: Todo List Project for Ubiq
+  version: '1.0.0'
+  title: TODO List
+  termsOfService: 'http://swagger.io/terms/'
+  contact:
+    name: Rodrigo Luque
+    email: roluquec@gmail.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+# host: localhost:3002
+# basePath: /api/v1
+# schemes:
+# - http
+paths:
+  /users/login:
+    post:
+      tags:
+        - User Module
+      summary: Login
+      description: API for Login
+      parameters:
+        - in: body
+          name: body
+          description: Login Payload
+          required: true
+          schema:
+            $ref: '#/definitions/UserLogin'
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Login Successfully
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        '400':
+          description: Invalid Fields
+        '500':
+          description: Internal Server Error
+  /users/:
+    post:
+      tags:
+        - User Module
+      summary: Signup
+      description: API for Signup
+      parameters:
+        - in: body
+          name: body
+          description: Signup Payload
+          required: true
+          schema:
+            $ref: '#/definitions/User'
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Signup Successfully
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        '400':
+          description: Invalid Fields
+        '500':
+          description: Internal Server Error
+  '/users/{id}':
+    delete:
+      security:
+        - Bearer: []
+      tags:
+      - User Module
+      summary: Remove User
+      description: Remove User
+      parameters:
+        - name: id
+          in: path
+          description: User Id
+          type: string
+          required: true
+      produces:
+        - application/json
+      responses:
+        204:
+          description: User Deleted Successfully
+        '400':
+          description: Invalid Fields
+        '500':
+          description: Internal Server Error
+  /tasks:
+    post:
+      security:
+        - Bearer: []
+      tags:
+        - Task Module
+      summary: Create task
+      description: API for creating Task
+      parameters:
+        - in: body
+          name: body
+          description: Create Task Payload
+          required: true
+          schema:
+            $ref: '#/definitions/Task'
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Task Created Successfully
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        '400':
+          description: Invalid Fields
+        '500':
+          description: Internal Server Error
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - Task Module
+      summary: Get all tasks
+      description: API for fetching all tasks
+      parameters:
+        - name: skip
+          in: query
+          description: No. of record to be skipped for pagination
+          type: number
+          required: true
+        - name: limit
+          in: query
+          description: No. of record api should return for pagination
+          type: number
+          required: true
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Tasks fetched Successfully
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        '400':
+          description: Invalid Fields
+        '500':
+          description: Internal Server Error
+  '/tasks/{id}':
+    put:
+      security:
+        - Bearer: []
+      tags:
+      - Task Module
+      summary: Update Task status
+      description: Update Task status
+      parameters:
+        - name: id
+          in: path
+          description: Task Id
+          type: string
+          required: true
+        - in: body
+          name: body
+          description: Update Task Payload
+          required: true
+          schema:
+            $ref: '#/definitions/TaskUpdateStatus'
+      produces:
+      - application/json
+      responses:
+        '200':
+          description: Task Updated Successfully
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        '400':
+          description: Invalid Fields
+        '500':
+          description: Internal Server Error
+    
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    name: Authorization
+    in: header
+definitions:
+  User:
+    properties:
+      name:
+        type: string
+        description: Name of the user
+      email:
+        type: string
+        description: Email of user
+      password:
+        type: string
+        description: Password of the user
+  UserLogin:
+    properties:
+      email:
+        type: string
+        description: Email of user
+      password:
+        type: string
+        description: Password of the user
+  Task:
+    properties:
+      description:
+        type: string
+        description: Task description
+      priority:
+        type: number
+        description: Task priority
+      status:
+        type: string
+        description: Task status. Only allows PENDING/DONE/DROPPED
+  TaskUpdateStatus:
+    properties:
+      status:
+        type: string
+        description: Task status. Only allows PENDING/DONE/DROPPED
+  ApiResponse:
+    type: object
+    properties:
+      code:
+        type: integer
+      status:
+        type: string
+      result:
+        type: object
+# Added by API Auto Mocking Plugin
+host: virtserver.swaggerhub.com
+basePath: /Rod35/Todo-list-ubiq/1.0.0
+schemes:
+ - https
+ - http

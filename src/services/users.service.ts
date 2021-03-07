@@ -36,7 +36,7 @@ class UsersService {
         return new ResponseDto<string>(INVALID_PASSWORD, 400, "ERROR");
       }
 
-      // Generate an auth token valid for 1 day and a refresh token generated randomly for it
+      // Generate an auth token valid for 1 day and a refresh token
       const token = jwt.sign({ id: userDb.id }, process.env.SECRET_KEY, { expiresIn: "1d" });
       const refreshToken = jwt.sign(user, process.env.REFRESH_SECRET_KEY, {});
       this.refreshTokens[refreshToken] = userDb.id;
