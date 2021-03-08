@@ -19,12 +19,16 @@ _(or use the endpoint: /api/v1/api-docs)_
 
 ## Installation
 
-IMPORTANT! This project requires [Node.js](https://nodejs.org/) to run. 
+IMPORTANT! This project requires [Node.js](https://nodejs.org/) and Postgres installed in your computer to run. 
 
-In order to run the tests, execute the following command:
+In the environment file located in the root of the project (.env), you might have to change some values of the database in order to connect to it.
+
+For running the tests, execute the following command:
+
 `npm test` 
 
 In order to run the project, execute the following command:
+
 `npm start` 
 
 ## To improve
@@ -35,3 +39,9 @@ The other aspect to improve in this project would be the tests, by making more o
 ## License
 
 MIT
+
+## Author
+
+Rodrigo Luque 
+
+2021

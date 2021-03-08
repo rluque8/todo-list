@@ -3,15 +3,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // GENERAL
 exports.QUERY_INIT_TABLES = `CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
-  name VARCHAR(50),
-  email VARCHAR(60),
-  password VARCHAR(200)
+  name VARCHAR(50) NOT NULL,
+  email VARCHAR(60) NOT NULL,
+  password VARCHAR(200) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS tasks (
   id SERIAL PRIMARY KEY,
-  description VARCHAR(100),
-  status VARCHAR(10),
+  description VARCHAR(100) NOT NULL,
+  status VARCHAR(10) NOT NULL,
   priority smallint DEFAULT 1,
   created_at timestamp);`;
 // USER
