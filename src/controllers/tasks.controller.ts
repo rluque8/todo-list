@@ -42,16 +42,19 @@ class TasksController {
   }
 
   public createTask = async (request: express.Request, response: express.Response) => {
-    response.send(await this.tasksService.create(request.body));
+    const resp = await this.tasksService.create(request.body);
+    return response.status(resp.code).json(resp);
   }
 
   public updateTask = async (request: express.Request, response: express.Response) => {
     const taskId = parseInt(request.params.id, 10);
-    response.send(await this.tasksService.updateStatus(taskId, request.body));
+    const resp = await this.tasksService.updateStatus(taskId, request.body);
+    return response.status(resp.code).json(resp);
   }
 
   public getAllTasks = async (request: express.Request, response: express.Response) => {
-    response.send(await this.tasksService.getAll(request.body));
+    const resp = await this.tasksService.getAll(request.body);
+    return response.status(resp.code).json(resp);
   }
 
 }
