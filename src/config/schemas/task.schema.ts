@@ -2,7 +2,7 @@ import Joi from "@hapi/joi";
 
 export const taskCreateSchema = Joi.object().keys({
   description: Joi.string().required(),
-  priority: Joi.number().min(1).max(3),
+  priority: Joi.number().min(1).max(3).required(),
   status: Joi.string().valid("PENDING", "DROPPED", "DONE").required(),
 });
 

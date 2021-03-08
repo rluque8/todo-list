@@ -21,9 +21,16 @@ _(or use the endpoint: /api/v1/api-docs)_
 
 IMPORTANT! This project requires [Node.js](https://nodejs.org/) to run. 
 
+In order to run the tests, execute the following command:
+`npm test` 
+
+In order to run the project, execute the following command:
+`npm start` 
+
 ## To improve
 
 One of the improvements to do over the project would be handling better the JWT refresh token logic which right now is not ideal.
+The other aspect to improve in this project would be the tests, by making more of them and with more coverage.
 
 ## License
 
