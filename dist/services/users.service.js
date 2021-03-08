@@ -14,6 +14,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const connection_1 = __importDefault(require("../config/database/connection"));
+const queries_1 = require("../config/database/queries");
 const response_dto_1 = require("../config/dto/response.dto");
 const messages_1 = require("../config/messages/messages");
 class UsersService {
@@ -29,7 +30,7 @@ class UsersService {
             try {
                 const client = yield connection_1.default.connect();
                 // Query to check if the user exists on db or not
-                const users = yield client.query(`SELECT * FROM users WHERE email = $1`, [user.email]);
+                const users = yield client.query(queries_1.QUERY_USER_BY_EMAIL, [user.email]);
                 if (!users || users.rows.length === 0) {
                     return new response_dto_1.ResponseDto(messages_1.NOT_FOUND_USER, 400, "ERROR");
                 }
@@ -83,13 +84,13 @@ class UsersService {
             try {
                 const client = yield connection_1.default.connect();
                 // Find in db if user email already exists and therefore duplicated
-                const users = yield client.query("SELECT id FROM users WHERE email = $1", [user.email]);
+                const users = yield client.query(queries_1.QUERY_USER_ID_BY_EMAIL, [user.email]);
                 if (!users || users.rows.length > 0) {
                     return new response_dto_1.ResponseDto(messages_1.DUPLICATED_ERROR_USERS, 400, "ERROR");
                 }
                 // Hash the plain password to store it in db with 12 salt rounds
                 const password = yield bcrypt_1.default.hash(user.password, 12);
-                yield client.query("INSERT INTO users(email, name, password) VALUES ($1, $2, $3)", [user.email, user.name, password]);
+                yield client.query(queries_1.QUERY_USER_INSERT, [user.email, user.name, password]);
                 client.release();
                 return new response_dto_1.ResponseDto(messages_1.CREATED_USER);
             }
@@ -108,7 +109,7 @@ class UsersService {
         this.delete = (id) => __awaiter(this, void 0, void 0, function* () {
             try {
                 const client = yield connection_1.default.connect();
-                yield client.query("DELETE FROM users WHERE id = $1", [id]);
+                yield client.query(queries_1.QUERY_USER_DELETE, [id]);
                 client.release();
                 return new response_dto_1.ResponseDto(messages_1.DELETED_USER, 500, "ERROR");
             }

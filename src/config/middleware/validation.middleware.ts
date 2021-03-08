@@ -27,7 +27,7 @@ class ValidationMiddleware {
     };
   }
 
-  private validateObjectSchema = (data, schema) => {
+  public validateObjectSchema = (data, schema) => {
     const result = schema.validate(data, { convert: false });
 
     if (result.error) {

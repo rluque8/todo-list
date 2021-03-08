@@ -24,6 +24,7 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const express_1 = __importDefault(require("express"));
 const swaggerUi = __importStar(require("swagger-ui-express"));
 const connection_1 = __importDefault(require("./config/database/connection"));
+const queries_1 = require("./config/database/queries");
 const swagger_file_1 = require("./config/swagger/swagger-file");
 class App {
     constructor(controllers, port) {
@@ -40,7 +41,7 @@ class App {
             this.app.use(cors_1.default());
         };
         this.initSwagger = () => {
-            // this.swaggerDocument = yaml.load("./config/swagger/swagger.yaml");
+            // Defined the endpoint to see the Swagger documentation with endpoints
             this.app.use(this.apiPath + "/api-docs", swaggerUi.serve, swaggerUi.setup(swagger_file_1.swaggerJson));
         };
         this.initializeControllers = (controllers) => {
@@ -65,19 +66,7 @@ class App {
         this.initDb = () => __awaiter(this, void 0, void 0, function* () {
             try {
                 const client = yield connection_1.default.connect();
-                yield client.query(`CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(50),
-        email VARCHAR(60),
-        password VARCHAR(200)
-      );
-
-      CREATE TABLE IF NOT EXISTS tasks (
-        id SERIAL PRIMARY KEY,
-        description VARCHAR(100),
-        status VARCHAR(10),
-        priority smallint DEFAULT 1,
-        created_at timestamp);`);
+                yield client.query(queries_1.QUERY_INIT_TABLES);
                 client.release();
             }
             catch (error) {
